@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letterhead — AI Cover Letter Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Newsreader:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #1c2430;
+    --ink-panel: #242e3c;
+    --ink-panel-2: #2b3646;
+    --paper: #fbf7ee;
+    --paper-shadow: #d8cdb4;
+    --brass: #c9a24b;
+    --brass-bright: #dab868;
+    --seal: #8b3a3a;
+    --seal-bright: #a54444;
+    --text-hi: #f1eee6;
+    --text-mid: #a8b0bd;
+    --ink-on-paper: #2a2620;
+    --ink-on-paper-soft: #5b5748;
+    --danger: #d98a6a;
+    --radius-card: 4px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 15% 0%, #263042 0%, transparent 45%),
+      radial-gradient(circle at 85% 100%, #202836 0%, transparent 45%),
+      var(--ink);
+    color: var(--text-hi);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  body{
+    padding: 48px 24px 80px;
+  }
+
+  .wrap{
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  header.masthead{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #3a4557;
+    flex-wrap: wrap;
+  }
+
+  .masthead h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 42px);
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--text-hi);
+  }
+
+  .masthead .brand-mark{
+    color: var(--brass-bright);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .masthead .tagline{
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    margin-top: 6px;
+  }
+
+  .masthead .ref{
+    font-size: 11px;
+    color: var(--text-mid);
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  main{
+    display: grid;
+    grid-template-columns: minmax(280px, 380px) 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  @media (max-width: 820px){
+    main{ grid-template-columns: 1fr; }
+  }
+
+  .desk-card{
+    background: var(--ink-panel);
+    border: 1px solid #3a4557;
+    border-radius: var(--radius-card);
+    padding: 28px 24px 24px;
+    box-shadow: 0 18px 40px -20px rgba(0,0,0,0.6);
+  }
+
+  .eyebrow{
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--brass-bright);
+    margin: 0 0 4px;
+  }
+
+  .desk-card h2{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    margin: 0 0 20px;
+    color: var(--text-hi);
+  }
+
+  .field{ margin-bottom: 18px; }
+
+  .field label{
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    margin-bottom: 7px;
+  }
+
+  .field input,
+  .field textarea{
+    width: 100%;
+    background: var(--ink-panel-2);
+    border: 1px solid #445064;
+    border-radius: 3px;
+    color: var(--text-hi);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    padding: 10px 12px;
+    resize: vertical;
+  }
+
+  .field textarea{ min-height: 66px; }
+  .field input::placeholder,
+  .field textarea::placeholder{ color: #6a7486; }
+
+  .field input:focus-visible,
+  .field textarea:focus-visible{
+    outline: 2px solid var(--brass-bright);
+    outline-offset: 1px;
+    border-color: var(--brass-bright);
+  }
+
+  .mode-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--ink-panel-2);
+    border: 1px solid #445064;
+    border-radius: 3px;
+    padding: 10px 12px;
+    margin-bottom: 20px;
+  }
+
+  .mode-row .mode-label{ font-size: 12px; color: var(--text-mid); }
+
+  .switch{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .switch input{
+    position: absolute;
+    opacity: 0;
+    width: 40px;
+    height: 22px;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .switch .track{
+    width: 40px;
+    height: 22px;
+    background: #3a4557;
+    border-radius: 999px;
+    position: relative;
+    transition: background 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .switch .track::after{
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--text-hi);
+    transition: transform 0.15s ease;
+  }
+
+  .switch input:checked + .track{ background: var(--brass); }
+  .switch input:checked + .track::after{ transform: translateX(18px); background: var(--ink); }
+  .switch input:focus-visible + .track{ outline: 2px solid var(--brass-bright); outline-offset: 2px; }
+  .switch .mode-name{ color: var(--text-hi); font-weight: 600; min-width: 82px; }
+
+  button.generate{
+    width: 100%;
+    background: var(--brass);
+    color: var(--ink);
+    border: none;
+    border-radius: 3px;
+    padding: 13px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  button.generate:hover{ background: var(--brass-bright); }
+  button.generate:active{ transform: translateY(1px); }
+  button.generate:disabled{ opacity: 0.55; cursor: not-allowed; }
+  button.generate:focus-visible{ outline: 2px solid var(--text-hi); outline-offset: 2px; }
+
+  .form-status{ min-height: 18px; font-size: 12px; color: var(--danger); margin-top: 10px; }
+
+  .letter-stage{ position: relative; min-height: 420px; }
+
+  .letter-sheet{
+    background: var(--paper);
+    color: var(--ink-on-paper);
+    border-radius: 2px;
+    padding: 46px 44px 40px;
+    min-height: 420px;
+    box-shadow: 0 30px 60px -25px rgba(0,0,0,0.55), 0 2px 0 var(--paper-shadow);
+    clip-path: polygon(
+      0% 1.2%, 3% 0%, 8% 1%, 13% 0%, 19% 1.1%, 24% 0.2%, 30% 1%, 36% 0%, 42% 1%, 48% 0.3%,
+      54% 1%, 60% 0%, 66% 1.1%, 72% 0.2%, 78% 1%, 84% 0%, 90% 1%, 95% 0.2%, 100% 1%,
+      100% 100%, 0% 100%
+    );
+  }
+
+  .letter-empty{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    min-height: 330px;
+    color: var(--ink-on-paper-soft);
+  }
+
+  .letter-empty .stamp-outline{
+    width: 54px;
+    height: 54px;
+    border: 2px dashed var(--paper-shadow);
+    border-radius: 50%;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--paper-shadow);
+    font-size: 22px;
+  }
+
+  .letter-empty p{
+    font-family: 'Newsreader', serif;
+    font-size: 17px;
+    max-width: 40ch;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .letter-head{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-on-paper-soft);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--paper-shadow);
+  }
+
+  .letter-body{ font-family: 'Newsreader', serif; font-size: 17px; line-height: 1.75; }
+  .letter-body p{ margin: 0 0 1.1em; }
+  .letter-body p:last-child{ margin-bottom: 0; }
+  .letter-body strong{ font-weight: 600; }
+
+  .loading{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-on-paper-soft);
+    height: 100%;
+    min-height: 330px;
+  }
+
+  .spinner{
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--paper-shadow);
+    border-top-color: var(--seal);
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .error-msg{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--seal); }
+
+  .stage-footer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 18px;
+    min-height: 56px;
+  }
+
+  .stage-note{ font-size: 12px; color: var(--text-mid); }
+
+  .seal-btn{
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: radial-gradient(circle at 35% 30%, var(--seal-bright), var(--seal) 70%);
+    color: var(--paper);
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 6px 14px -4px rgba(0,0,0,0.5);
+    transition: transform 0.12s ease;
+    flex-shrink: 0;
+  }
+
+  .seal-btn:hover{ transform: scale(1.05); }
+  .seal-btn:active{ transform: scale(0.94); }
+  .seal-btn:focus-visible{ outline: 2px solid var(--brass-bright); outline-offset: 3px; }
+  .seal-btn[hidden]{ display: none; }
+
+  @media (prefers-reduced-motion: reduce){
+    .seal-btn, button.generate, .switch .track::after{ transition: none; }
+    .spinner{ animation: none; border-top-color: var(--seal); }
+  }
+
+  footer.foot-note{
+    max-width: 1100px;
+    margin: 48px auto 0;
+    font-size: 11px;
+    color: var(--text-mid);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .sr-only{
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <h1>Letter<span class="brand-mark">head</span></h1>
+      <p class="tagline">AI Cover Letter Generator</p>
+    </div>
+    <div class="ref">
+      Draft mode: instant template<br>
+      Gemini mode: live AI generation
+    </div>
+  </header>
+
+  <main>
+    <section class="desk-card" aria-labelledby="form-heading">
+      <p class="eyebrow">Applicant details</p>
+      <h2 id="form-heading">Draft your letter</h2>
+
+      <form id="coverLetterForm" novalidate>
+        <div class="field">
+          <label for="name">Candidate name</label>
+          <input type="text" id="name" name="name" placeholder="e.g. Vishal Kumar" maxlength="120" required>
+        </div>
+        <div class="field">
+          <label for="role">Job role</label>
+          <input type="text" id="role" name="role" placeholder="e.g. Associate Consultant" maxlength="120" required>
+        </div>
+        <div class="field">
+          <label for="company">Target company</label>
+          <input type="text" id="company" name="company" placeholder="e.g. Bain &amp; Company" maxlength="120" required>
+        </div>
+        <div class="field">
+          <label for="skills">Key skills</label>
+          <textarea id="skills" name="skills" placeholder="e.g. data-driven strategy, stakeholder management, market analysis" maxlength="500" required></textarea>
+        </div>
+
+        <div class="mode-row">
+          <span class="mode-label">Generation mode</span>
+          <label class="switch">
+            <span class="mode-name" id="modeName">Draft</span>
+            <input type="checkbox" id="modeToggle" aria-describedby="modeName">
+            <span class="track" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <button type="submit" class="generate" id="generateBtn">Generate cover letter</button>
+        <p class="form-status" id="formStatus" role="alert"></p>
+      </form>
+    </section>
+
+    <section class="letter-stage" aria-labelledby="letter-heading">
+      <h2 id="letter-heading" class="sr-only">Generated cover letter</h2>
+      <div class="letter-sheet">
+        <div id="letterInner">
+          <div class="letter-empty">
+            <div class="stamp-outline" aria-hidden="true">Aa</div>
+            <p>Fill in the form and generate a letter — it will appear here, ready to send.</p>
+          </div>
+        </div>
+      </div>
+      <div class="stage-footer">
+        <p class="stage-note" id="stageNote" aria-live="polite"></p>
+        <button type="button" class="seal-btn" id="copyBtn" hidden aria-label="Copy cover letter to clipboard">Copy</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot-note">
+    <span>Sprint 04 — AI Cover Letter Generator</span>
+    <span>Phase 1 (template draft) + Phase 2 (Gemini API) complete</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const form = document.getElementById('coverLetterForm');
+  const nameEl = document.getElementById('name');
+  const roleEl = document.getElementById('role');
+  const companyEl = document.getElementById('company');
+  const skillsEl = document.getElementById('skills');
+  const modeToggle = document.getElementById('modeToggle');
+  const modeName = document.getElementById('modeName');
+  const generateBtn = document.getElementById('generateBtn');
+  const formStatus = document.getElementById('formStatus');
+  const letterInner = document.getElementById('letterInner');
+  const stageNote = document.getElementById('stageNote');
+  const copyBtn = document.getElementById('copyBtn');
+
+  let currentLetterText = '';
+
+  modeToggle.addEventListener('change', function(){
+    modeName.textContent = modeToggle.checked ? 'Gemini AI' : 'Draft';
+  });
+
+  // Escape any string before it ever touches innerHTML — defends against
+  // both malicious user input and an unexpected AI response containing markup.
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  // Minimal, safe markdown-ish renderer: escapes first, then only allows
+  // **bold** and paragraph breaks. Never inserts raw text as HTML.
+  function renderLetter(rawText){
+    const escaped = escapeHtml(rawText);
+    const paragraphs = escaped.split(/\n\s*\n/).map(function(p){ return p.trim(); }).filter(Boolean);
+    const html = paragraphs.map(function(p){
+      let out = p.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      out = out.replace(/\n/g, '<br>');
+      return '<p>' + out + '</p>';
+    }).join('');
+
+    letterInner.innerHTML =
+      '<div class="letter-head"><span>Cover Letter</span><span>' + escapeHtml(new Date().toLocaleDateString()) + '</span></div>' +
+      '<div class="letter-body">' + html + '</div>';
+  }
+
+  function showLoading(){
+    letterInner.innerHTML =
+      '<div class="loading"><span class="spinner" aria-hidden="true"></span> Generating with Gemini — this can take a few seconds…</div>';
+  }
+
+  function showError(message){
+    letterInner.innerHTML = '<p class="error-msg">' + escapeHtml(message) + '</p>';
+  }
+
+  function templateLetter(data){
+    const skillsList = data.skills.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+    const skillsPhrase = skillsList.length ? skillsList.join(', ') : 'a strong and adaptable skill set';
+    const firstSkill = skillsList[0] || 'my field';
+    return 'Dear Hiring Manager at ' + data.company + ',\n\n' +
+      'I am ' + data.name + ', and I am excited to apply for the ' + data.role + ' position at ' + data.company + '. With a background that includes ' + skillsPhrase + ', I am confident I can contribute meaningfully to your team from day one.\n\n' +
+      'Throughout my career, I have focused on delivering results while continuously building my expertise in ' + firstSkill + '. I am particularly drawn to ' + data.company + '\'s work and would welcome the opportunity to bring my skills to your organization.\n\n' +
+      'Thank you for considering my application. I would love the chance to discuss how my background aligns with your team\'s goals.\n\n' +
+      'Sincerely,\n' + data.name;
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    formStatus.textContent = '';
+
+    const data = {
+      name: nameEl.value.trim(),
+      role: roleEl.value.trim(),
+      company: companyEl.value.trim(),
+      skills: skillsEl.value.trim(),
+    };
+
+    if (!data.name || !data.role || !data.company || !data.skills){
+      formStatus.textContent = 'Please fill in every field before generating.';
+      return;
+    }
+
+    copyBtn.hidden = true;
+    stageNote.textContent = '';
+
+    if (!modeToggle.checked){
+      const letter = templateLetter(data);
+      currentLetterText = letter;
+      renderLetter(letter);
+      copyBtn.hidden = false;
+      stageNote.textContent = 'Instant draft — template-based, no API call.';
+      return;
+    }
+
+    generateBtn.disabled = true;
+    showLoading();
+
+    try {
+      const res = await fetch('/api/generate-cover-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const payload = await res.json();
+
+      if (!res.ok){
+        throw new Error(payload.error || 'Failed to generate the cover letter.');
+      }
+
+      currentLetterText = payload.letter;
+      renderLetter(payload.letter);
+      copyBtn.hidden = false;
+      stageNote.textContent = 'Generated live by Gemini AI.';
+    } catch (err){
+      showError(err.message || 'Something went wrong. Please try again.');
+      stageNote.textContent = '';
+    } finally {
+      generateBtn.disabled = false;
+    }
+  });
+
+  copyBtn.addEventListener('click', async function(){
+    if (!currentLetterText) return;
+    try {
+      await navigator.clipboard.writeText(currentLetterText);
+      const original = copyBtn.textContent;
+      copyBtn.textContent = 'Sealed';
+      stageNote.textContent = 'Copied to clipboard.';
+      setTimeout(function(){ copyBtn.textContent = original; }, 1600);
+    } catch (err){
+      stageNote.textContent = 'Could not copy automatically — select and copy the text manually.';
+    }
+  });
+})();
+</script>
+</body>
+</html>
